@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using SportsLeague.Domain.Entities;
+using SportsLeague.Domain.Enums;
 
 
 namespace SportsLeague.DataAccess.Context;
@@ -28,6 +29,8 @@ public class LeagueDbContext : DbContext
     public DbSet<Tournament> Tournaments => Set<Tournament>(); 
 
     public DbSet<TournamentTeam> TournamentTeams => Set<TournamentTeam>(); 
+
+    public DbSet<Sponsor> Sponsors => Set<Sponsor>();
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -267,6 +270,100 @@ public class LeagueDbContext : DbContext
 
         });
 
+        // ── Sponsor Configuration ──
+
+        modelBuilder.Entity<Sponsor>(entity =>
+
+        {
+
+            entity.HasKey(s => s.Id);
+
+            entity.Property(s => s.Name)
+
+            .IsRequired()
+
+            .HasMaxLength(150);
+
+            //This means that two sponsors cannot have the same name in the database
+
+            entity.HasIndex(s => s.Name)
+
+            .IsUnique();
+
+            entity.Property(s => s.ContactEmail)
+
+            .IsRequired();
+
+            // Ensure that ContactEmail has an email format
+
+            entity.ToTable(s => s.HasCheckConstraint
+            ("CK_Sponsor_ContactEmail", "ContactEmail LIKE '%@%.%'"));
+
+            entity.Property(s => s.Phone);
+
+            entity.Property(s => s.WebsiteUrl);
+
+            entity.Property(s => s.Category)
+
+            .IsRequired();
+
+            entity.Property(s => s.CreatedAt)
+
+            .IsRequired();
+
+            entity.Property(s => s.UpdatedAt)
+
+            .IsRequired(false);
+
+        });
+
+        // ── TournamentSponsor Configuration ──
+
+        modelBuilder.Entity<TournamentSponsor>(entity =>
+
+        {
+
+            entity.HasKey(ts => ts.Id);
+
+            entity.Property(ts => ts.ContractAmount)
+            .IsRequired()
+            .HasPrecision(18, 2);
+
+            entity.Property(ts => ts.JoinedAt)
+            .IsRequired();
+
+            entity.ToTable(s => s.HasCheckConstraint
+            ("CK_TournamentSponsor_ContractAmount", "ContractAmount > 0"));
+
+            // Tournament relationship
+
+            entity.HasOne(ts => ts.Tournament)
+
+            .WithMany(t => t.TournamentSponsors)
+
+            .HasForeignKey(ts => ts.TournamentId)
+
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Sponsor relationship
+
+            entity.HasOne(ts => ts.Sponsor)
+
+            .WithMany(s => s.TournamentSponsors)
+
+            .HasForeignKey(ts => ts.SponsorId)
+
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Compound unique index to ensure a sponsor can only be associated once with a tournament
+
+            entity.HasIndex(ts => new { ts.TournamentId, ts.SponsorId })
+
+            .IsUnique();
+
+        });
     }
 
 }

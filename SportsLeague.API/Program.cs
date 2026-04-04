@@ -38,6 +38,10 @@ builder.Services.AddScoped<ITournamentRepository, TournamentRepository>();
 
 builder.Services.AddScoped<ITournamentTeamRepository, TournamentTeamRepository>();
 
+builder.Services.AddScoped<ISponsorRepository, SponsorRepository>();
+
+builder.Services.AddScoped<ITournamentSponsorRepository, TournamentSponsorRepository>();
+
 
 // ── Services ──
 
@@ -49,11 +53,13 @@ builder.Services.AddScoped<IRefereeService, RefereeService>();
 
 builder.Services.AddScoped<ITournamentService, TournamentService>();
 
+builder.Services.AddScoped<ISponsorService, SponsorService>();
+
 
 // ── AutoMapper ──
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
-
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // ── Controllers ──
 
