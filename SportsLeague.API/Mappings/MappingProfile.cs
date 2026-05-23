@@ -113,6 +113,18 @@ public class MappingProfile : Profile
 
                     src.Player.FirstName + " " + src.Player.LastName));
 
+        // MatchLineup mappings
+        CreateMap<MatchLineupRequestDTO, MatchLineup>();
+
+        CreateMap<MatchLineup, MatchLineupResponseDTO>()
+            .ForMember(dest => dest.PlayerName,
+                opt => opt.MapFrom(src =>
+                    src.Player != null ? src.Player.FirstName + " " + src.Player.LastName : string.Empty))
+
+            .ForMember(dest => dest.TeamName,
+                opt => opt.MapFrom(src =>
+                    src.Player != null && src.Player.Team != null ? src.Player.Team.Name : string.Empty));
+
     }
 
 }

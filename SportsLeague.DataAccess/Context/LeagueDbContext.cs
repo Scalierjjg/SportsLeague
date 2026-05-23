@@ -40,6 +40,8 @@ public class LeagueDbContext : DbContext
 
     public DbSet<Card> Cards => Set<Card>();
 
+    //public DbSet<MatchLineup> MatchLineup => Set<MatchLineup>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
 
@@ -568,6 +570,59 @@ public class LeagueDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
 
         });
+        
+        // ── MatchLineup Configuration ──
+
+        modelBuilder.Entity<MatchLineup>(entity =>
+
+        {
+
+            entity.HasKey(ml => ml.Id);
+
+            entity.Property(ml => ml.Position)
+
+            .IsRequired()
+
+            .HasMaxLength(80);
+
+            entity.Property(ml => ml.IsStarter)
+
+            .IsRequired();
+
+            entity.Property(ml => ml.MatchId)
+
+            .IsRequired();
+
+            entity.Property(ml => ml.PlayerId)
+
+            .IsRequired();
+
+            // Relación 1:N con Match
+            entity.HasOne(ml => ml.Match)
+
+                .WithMany(m => m.MatchLineups)
+
+                .HasForeignKey(ml => ml.MatchId)
+
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Relación 1:N con Player
+            entity.HasOne(ml => ml.Player)
+
+                .WithMany(p => p.MatchLineups)
+
+                .HasForeignKey(ml => ml.PlayerId)
+
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Índice único compuesto: un jugador no puede estar duplicado en el mismo partido
+            entity.HasIndex(ml => new { ml.MatchId, ml.PlayerId })
+
+                .IsUnique();
+
+
+        });
+        
 
     }
 

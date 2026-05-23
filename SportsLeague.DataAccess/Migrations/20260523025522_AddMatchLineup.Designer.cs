@@ -12,8 +12,8 @@ using SportsLeague.DataAccess.Context;
 namespace SportsLeague.DataAccess.Migrations
 {
     [DbContext(typeof(LeagueDbContext))]
-    [Migration("20260522063840_New3TablesMatchResultGoalCard")]
-    partial class New3TablesMatchResultGoalCard
+    [Migration("20260523025522_AddMatchLineup")]
+    partial class AddMatchLineup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,44 @@ namespace SportsLeague.DataAccess.Migrations
                     b.HasIndex("TournamentId");
 
                     b.ToTable("Matches");
+                });
+
+            modelBuilder.Entity("SportsLeague.Domain.Entities.MatchLineup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsStarter")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MatchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlayerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerId");
+
+                    b.HasIndex("MatchId", "PlayerId")
+                        .IsUnique();
+
+                    b.ToTable("MatchLineup");
                 });
 
             modelBuilder.Entity("SportsLeague.Domain.Entities.MatchResult", b =>
@@ -532,6 +570,25 @@ namespace SportsLeague.DataAccess.Migrations
                     b.Navigation("Tournament");
                 });
 
+            modelBuilder.Entity("SportsLeague.Domain.Entities.MatchLineup", b =>
+                {
+                    b.HasOne("SportsLeague.Domain.Entities.Match", "Match")
+                        .WithMany("MatchLineups")
+                        .HasForeignKey("MatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SportsLeague.Domain.Entities.Player", "Player")
+                        .WithMany("MatchLineups")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+
+                    b.Navigation("Player");
+                });
+
             modelBuilder.Entity("SportsLeague.Domain.Entities.MatchResult", b =>
                 {
                     b.HasOne("SportsLeague.Domain.Entities.Match", "Match")
@@ -598,6 +655,8 @@ namespace SportsLeague.DataAccess.Migrations
 
                     b.Navigation("Goals");
 
+                    b.Navigation("MatchLineups");
+
                     b.Navigation("MatchResult");
                 });
 
@@ -606,6 +665,8 @@ namespace SportsLeague.DataAccess.Migrations
                     b.Navigation("Cards");
 
                     b.Navigation("Goals");
+
+                    b.Navigation("MatchLineups");
                 });
 
             modelBuilder.Entity("SportsLeague.Domain.Entities.Referee", b =>

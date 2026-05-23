@@ -33,7 +33,6 @@ public class MatchValidationHelper
 
 
     public async Task<Match> ValidateMatchForEventAsync(int matchId)
-
     {
 
         var match = await _matchRepository.GetByIdAsync(matchId);
@@ -103,6 +102,32 @@ public class MatchValidationHelper
             throw new InvalidOperationException(
 
                 "El minuto debe estar entre 1 y 120");
+
+    }
+
+    // Validación para lineups siempre y cuando se encuentre en Scheduled (0)
+    public async Task<Match> ValidateMatchForLineupAsync(int matchId)
+    {
+
+        var match = await _matchRepository.GetByIdAsync(matchId);
+
+        if (match == null)
+
+            throw new KeyNotFoundException(
+
+                $"No se encontró el partido con ID {matchId}");
+
+
+
+        if (match.Status != MatchStatus.Scheduled)
+
+            throw new InvalidOperationException(
+
+                "Solo se pueden registrar eventos en partidos Scheduled");
+
+
+
+        return match;
 
     }
 

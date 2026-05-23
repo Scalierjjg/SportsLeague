@@ -32,4 +32,8 @@ public class Player : AuditBase
 
     public ICollection<Card> Cards { get; set; } = new List<Card>();
 
+    //relacion con MatchLineup 
+
+    public ICollection<MatchLineup> MatchLineups { get; set; } = new List<MatchLineup>();
+
 }
