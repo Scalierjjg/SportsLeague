@@ -1,0 +1,19 @@
+In order to create the folders:
+1. cd SportsLeague // Carpeta
+2. dotnet new sln -n SportsLeague // Solucion
+3. dotnet new webapi -n SportsLeague.API -controllers // Proyecto API (Web API) 
+4. dotnet new classlib -n SportsLeague.Domain // Proyecto Domain (Class Library)
+5. dotnet new classlib -n SportsLeague.DataAccess // # Proyecto DataAccess (Class Library) 
+6. Agregar los proyectos a la solución:
+    dotnet sln add SportsLeague.API/SportsLeague.API.csproj 
+    dotnet sln add SportsLeague.Domain/SportsLeague.Domain.csproj 
+    dotnet sln add SportsLeague.DataAccess/SportsLeague.DataAccess.csproj 
+7. Configurar las referencias entre proyectos
+    # API referencia a Domain 
+    dotnet add SportsLeague.API/SportsLeague.API.csproj reference SportsLeague.Domain/SportsLeague.Domain.csproj 
+    # API referencia a DataAccess (para registrar servicios en Program.cs) 
+    dotnet add SportsLeague.API/SportsLeague.API.csproj reference SportsLeague.DataAccess/SportsLeague.DataAccess.csproj 
+    # DataAccess referencia a Domain
+    dotnet add SportsLeague.DataAccess/SportsLeague.DataAccess.csproj reference SportsLeague.Domain/SportsLeague.Domain.csproj
+
+    
